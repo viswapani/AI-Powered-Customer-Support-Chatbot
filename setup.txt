@@ -1,0 +1,66 @@
+MedEquip Chatbot – Project & Environment Setup Commands (Windows / PowerShell)
+
+1. Project directory
+
+Assuming you’re already in:
+pwsh
+Initial project layout (executed earlier via tools):
+pwsh
+2. Python 3.11 virtual environment
+
+Check that Python 3.11 is installed:
+pwsh
+Create a Python 3.11 virtual environment:
+pwsh
+Activating the venv in PowerShell
+
+If execution policy allows scripts:
+pwsh
+If you see the “running scripts is disabled on this system” error, use one of:
+
+Option A – temporary (current session only):
+pwsh
+Option B – more permanent for your user:
+
+Run PowerShell as Administrator, then:
+pwsh
+Close that window, open a new normal PowerShell, then:
+pwsh
+Option C – use cmd.exe instead of PowerShell:
+cmd
+3. Install Python dependencies
+
+With the virtual environment active:
+pwsh
+(requirements.txt contains: openai, langchain, langchain-openai, langchain-community, chromadb, faker, pandas, sqlalchemy, mysql-connector-python, pymysql.)
+
+4. MySQL-backed database initialization
+
+Configure MySQL (either via config.py defaults or environment variables):
+
+•  MEDEQUIP_DB_HOST
+•  MEDEQUIP_DB_PORT
+•  MEDEQUIP_DB_USER
+•  MEDEQUIP_DB_PASSWORD
+•  MEDEQUIP_DB_NAME
+
+Then run the database initializer (this:
+
+•  auto‑creates the database if needed,
+•  creates all tables,
+•  seeds sample data):
+pwsh
+5. Run the chatbot CLI
+
+With the same virtualenv active:
+pwsh
+Example usage inside the CLI:
+
+•  auth → then enter email / Client ID
+•  ask things like:
+◦  What are your support hours?
+◦  When will my order ORD-2024-0001 arrive?
+
+
+
+If you’d like, I can turn this into a more polished README-style setup section tailored to how you plan to deploy (local only vs. Colab vs. server).

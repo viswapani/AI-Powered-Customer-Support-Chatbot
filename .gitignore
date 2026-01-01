@@ -1,0 +1,34 @@
+# Python bytecode / cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+.venv311/
+
+# Environment / secrets
+.env
+
+# Local data / vector store artifacts
+data/*.db
+vectorstore/
+chroma/
+*.sqlite
+
+# Test / tooling caches
+*.log
+*.tmp
+*.coverage
+.pytest_cache/
+.mypy_cache/
+
+# Editors / IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# OS-specific
+Thumbs.db
+Desktop.ini
+.DS_Store

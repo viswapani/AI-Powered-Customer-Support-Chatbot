@@ -1,0 +1,97 @@
+MedEquip Chatbot – Project & Environment Setup Commands (Windows / PowerShell)
+
+1. Project directory
+--------------------
+
+Assuming project root:
+
+    cd C:\Pani\AI-Powered-Customer-Support-Chatbot
+
+Initial project layout (created earlier):
+
+    mkdir data, vectorstore, tests
+
+
+2. Python 3.11 virtual environment
+----------------------------------
+
+Check that Python 3.11 is installed:
+
+    py -3.11 -V
+
+Create a Python 3.11 virtual environment:
+
+    py -3.11 -m venv .venv311
+
+
+2.1 Activate the venv in PowerShell
+-----------------------------------
+
+If execution policy already allows scripts:
+
+    .venv311\Scripts\Activate.ps1
+
+If you get the "running scripts is disabled on this system" error, use ONE of the options below.
+
+Option A – temporary (current session only):
+
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+    .venv311\Scripts\Activate.ps1
+
+Option B – more permanent for your user (run in an elevated PowerShell):
+
+    Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+
+Then in a new, normal PowerShell window:
+
+    cd C:\Pani\AI-Powered-Customer-Support-Chatbot
+    .venv311\Scripts\Activate.ps1
+
+Option C – use cmd.exe instead of PowerShell:
+
+    cd C:\Pani\AI-Powered-Customer-Support-Chatbot
+    .venv311\Scripts\activate.bat
+
+
+3. Install Python dependencies
+------------------------------
+
+With the virtual environment active:
+
+    pip install --upgrade pip
+    pip install -r requirements.txt
+
+(Where requirements.txt includes openai, langchain, langchain-openai, langchain-community,
+chromadb, faker, pandas, sqlalchemy, mysql-connector-python, pymysql.)
+
+
+4. MySQL-backed database initialization
+---------------------------------------
+
+Configure MySQL (via config.py defaults or environment variables):
+
+    MEDEQUIP_DB_HOST
+    MEDEQUIP_DB_PORT
+    MEDEQUIP_DB_USER
+    MEDEQUIP_DB_PASSWORD
+    MEDEQUIP_DB_NAME
+
+Then run the database initializer (creates DB if needed, creates tables, seeds sample data):
+
+    python database.py
+
+
+5. Run the chatbot CLI
+----------------------
+
+With the same virtualenv active:
+
+    python chatbot.py
+
+Example usage inside the CLI:
+
+    auth
+    # then provide email and Client ID when prompted
+
+    What are your support hours?
+    When will my order ORD-2024-0001 arrive?
