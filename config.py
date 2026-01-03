@@ -19,7 +19,7 @@ DB_BACKEND = "mysql"  # or "sqlite"
 MYSQL_HOST = os.environ.get("MEDEQUIP_DB_HOST", "localhost")
 MYSQL_PORT = int(os.environ.get("MEDEQUIP_DB_PORT", "3306"))
 MYSQL_USER = os.environ.get("MEDEQUIP_DB_USER", "medequip_user")
-MYSQL_PASSWORD = os.environ.get("MEDEQUIP_DB_PASSWORD", "change-me")
+MYSQL_PASSWORD = os.environ.get("MEDEQUIP_DB_PASSWORD", "medequip123")
 MYSQL_DB = os.environ.get("MEDEQUIP_DB_NAME", "medequip")
 
 # Optional SQLAlchemy-style DSN for future use
@@ -28,8 +28,12 @@ MYSQL_DSN = (
     f"@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
 )
 
-# Vector store configuration
-VECTORSTORE_PATH = VECTORSTORE_DIR / "chroma_db"
+# Vector store / Qdrant configuration
+QDRANT_HOST = os.environ.get("QDRANT_HOST", "localhost")
+QDRANT_PORT = int(os.environ.get("QDRANT_PORT", "6333"))
+QDRANT_COLLECTION = os.environ.get("QDRANT_COLLECTION", "medequip_kb")
+EMBEDDING_MODEL = os.environ.get("EMBEDDING_MODEL", "text-embedding-3-small")
+EMBEDDING_DIM = int(os.environ.get("EMBEDDING_DIM", "1536"))
 
 # LLM configuration (from spec)
 OPENAI_MODEL = "gpt-4o-mini"
@@ -37,6 +41,11 @@ TEMPERATURE = 0
 MAX_HISTORY_TURNS = 10
 RAG_TOP_K = 3
 SQL_TIMEOUT = 5
+
+# Feature toggles
+# When False, the chatbot will not perform RAG lookups and will rely on
+# SQL-backed flows and simple fallbacks only.
+ENABLE_RAG = True
 
 __all__ = [
     "BASE_DIR",
@@ -50,10 +59,15 @@ __all__ = [
     "MYSQL_PASSWORD",
     "MYSQL_DB",
     "MYSQL_DSN",
-    "VECTORSTORE_PATH",
+    "QDRANT_HOST",
+    "QDRANT_PORT",
+    "QDRANT_COLLECTION",
+    "EMBEDDING_MODEL",
+    "EMBEDDING_DIM",
     "OPENAI_MODEL",
     "TEMPERATURE",
     "MAX_HISTORY_TURNS",
     "RAG_TOP_K",
     "SQL_TIMEOUT",
+    "ENABLE_RAG",
 ]

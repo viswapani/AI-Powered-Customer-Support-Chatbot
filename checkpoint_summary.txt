@@ -1,0 +1,60 @@
+MedEquip Chatbot – Checkpoint Summary (2026-01-01)
+
+What is done
+------------
+- Core project files created and wired together:
+  - config.py: paths, MySQL settings (DB_BACKEND=mysql), OpenAI model config, RAG params.
+  - database.py: MySQL-backed schema creation, helper functions, sample data seeding, and
+    ensure_mysql_database_exists() so the DB is created automatically.
+  - rag_pipeline.py: Chroma + OpenAI embeddings RAG pipeline with 10 core knowledge docs.
+  - chatbot.py: MedEquipChatbot class with:
+    - Basic rule-based intent classification.
+    - Simple SQL generation for orders, tickets, invoices, warranty, spare parts.
+    - RAG search integration.
+    - CLI loop with commands: quit/exit, auth, history.
+  - test_scenarios.py: simple script for UC9 (support hours, no auth) and
+    UC1 (order tracking after auth).
+  - requirements.txt: Python dependencies for the project.
+  - setup_notes.txt: Notes and commands to set up Python env and run the project.
+- Environment/secrets:
+  - .env file created and populated (OpenAI API key and MySQL connection vars).
+- Git:
+  - Git repo initialized locally.
+  - First commit created on main.
+  - Remote origin added and code pushed.
+- Utility files:
+  - .gitignore configured to ignore venvs, .env, caches, data/vectorstore artifacts, etc.
+
+What to do next session
+------------------------
+1. Reactivate environment (PowerShell example):
+
+   cd C:\Pani\AI-Powered-Customer-Support-Chatbot
+   .venv311\Scripts\Activate.ps1
+
+   (If execution policy blocks scripts, use the temporary bypass from setup_notes.txt.)
+
+2. Ensure dependencies are installed (if using a fresh env):
+
+   pip install -r requirements.txt
+
+3. Initialize / refresh the database (if needed):
+
+   python database.py
+
+4. Smoke-test chatbot CLI:
+
+   python chatbot.py
+
+   - Ask: "What are your support hours?" (RAG, no auth)
+   - Run: auth
+     - Email: contact@cityhospital.com
+     - Client ID: ME-10001
+   - Ask: "When will my order ORD-2024-0001 arrive?" (order/shipments via SQL)
+
+5. Next development steps (after tests pass):
+   - Improve intent classification logic and entity extraction.
+   - Replace rule-based SQL generator with an LLM-powered SQL generator using
+     the prompts from the spec.
+   - Replace rule-based response templates with LLM-based response generation.
+   - Add more test scenarios and edge-case handling (errors, empty RAG results, etc.).

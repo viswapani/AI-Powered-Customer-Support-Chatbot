@@ -11,7 +11,7 @@ import json
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional
 
-from config import MAX_HISTORY_TURNS
+from config import ENABLE_RAG, MAX_HISTORY_TURNS
 from database import get_client_by_credentials, initialize_database
 from rag_pipeline import search_knowledge
 
@@ -272,7 +272,8 @@ class MedEquipChatbot:
         if sql:
             sql_results = self.execute_sql_query(sql, intent["entities"])
 
-        if intent["data_source"] in {"RAG", "BOTH"}:
+        # Only perform RAG lookups if explicitly enabled in config.
+        if ENABLE_RAG and intent["data_source"] in {"RAG", "BOTH"}:
             rag_context = self.search_knowledge_base(message)
 
         response = self.generate_response(message, intent, sql_results, rag_context)

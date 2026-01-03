@@ -6,6 +6,14 @@ end-to-end flows using the current rule-based implementation.
 
 from __future__ import annotations
 
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+# Load environment variables from .env in the project root so config.py
+# and database.py pick up MEDEQUIP_DB_* values correctly when imported.
+load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env")
+
 from chatbot import MedEquipChatbot
 from database import initialize_database
 

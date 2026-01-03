@@ -1,0 +1,33 @@
+MedEquip Chatbot - Work context as of 2026-01-01
+
+1. MySQL schema issue fixed
+- Original error: "BLOB/TEXT column 'client_id' used in key specification without a key length" when running `python database.py`.
+- Root cause: `clients.client_id` (and other ID fields) were defined as TEXT but used in UNIQUE and FOREIGN KEY constraints.
+- Fix: updated `database.py` so all identifier columns used in keys are VARCHAR instead of TEXT, with consistent lengths across tables.
+  Key examples in create_database():
+  - clients.client_id -> VARCHAR(64) UNIQUE NOT NULL
+  - equipment_registry.client_id -> VARCHAR(64) NOT NULL (FK to clients.client_id)
+  - orders.client_id -> VARCHAR(64) NOT NULL (FK)
+  - support_tickets.client_id -> VARCHAR(64) NOT NULL (FK)
+  - invoices.client_id -> VARCHAR(64) NOT NULL (FK)
+  - All other ID-like fields used in UNIQUE/FK constraints (sku, serial_number, region_code, tech_id, appointment_id, warranty_id, amc_id, claim_id, ticket_id, invoice_id, payment_id, part_number, and related FK columns) now use appropriate VARCHAR sizes.
+
+2. Other type cleanups
+- Date-like fields changed from TEXT to DATE or DATETIME.
+- Monetary amounts changed from REAL to DECIMAL(12, 2).
+
+3. Current status
+- Command `python database.py` now succeeds without errors.
+- Output:
+  - Initializing MedEquip MySQL database 'medequip' on localhost:3306
+  - Database initialization complete.
+- Database `medequip` exists and is seeded with sample data (clients, products, equipment_registry, orders, shipments, warranties, support_tickets, ticket_history, invoices, payments, parts_catalog).
+
+4. Suggested next steps for tomorrow
+- Verify chatbot logic that depends on the DB:
+  - Any login/auth that uses Client (get_client_by_credentials).
+  - Any intents that query orders, shipments, warranties, support tickets, invoices, or parts.
+- Write or run existing tests (if any) against the DB-backed functions.
+- Hook the conversation-handling layer (LLM / routing) to these DB helpers if not already wired up.
+
+This file summarizes the DB-related work already completed so you can quickly resume chatbot development tomorrow.
