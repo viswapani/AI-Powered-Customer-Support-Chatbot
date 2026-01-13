@@ -1,0 +1,50 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: medequip-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: medequip
+      MYSQL_USER: medequip_user
+      MYSQL_PASSWORD: medequip123
+      MYSQL_ROOT_PASSWORD: rootpassword   # choose any strong password
+    ports:
+      - "3306:3306"    # optional, only needed if you want to connect from host tools
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
+  chatbot:
+    build: .
+    container_name: medequip-chatbot
+    depends_on:
+      - db
+      - qdrant
+    environment:
+      # Qdrant connection (already working)
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+
+      # MySQL connection: OVERRIDE defaults in config.py
+      MEDEQUIP_DB_HOST: db
+      MEDEQUIP_DB_PORT: 3306
+      MEDEQUIP_DB_USER: medequip_user
+      MEDEQUIP_DB_PASSWORD: medequip123
+      MEDEQUIP_DB_NAME: medequip
+
+      # OpenAI key
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+
+    ports:
+      - "8000:8000"
+
+volumes:
+  qdrant_storage:
+  mysql_data:

@@ -109,31 +109,10 @@ def _embed_texts(texts: List[str]) -> List[List[float]]:
 
 
 def create_knowledge_base():
-    """Ensure the base MedEquip KB documents exist in Qdrant.
+    """Initialize Qdrant with the 10 core MedEquip documents.
 
-    This function is now **non-destructive**:
-    - If the collection does not exist, it will be created and seeded.
-    - If the collection already exists and has points, it will be left as-is.
-
-    This makes it safe to call on every application startup (e.g. from a
-    Dockerized web app) without wiping user-uploaded documents.
+    This recreates the Qdrant collection so the operation is idempotent.
     """
-
-    client = _get_qdrant_client()
-    # If collection does not exist, create it
-    if not client.collection_exists(QDRANT_COLLECTION):
-        client.create_collection(
-            collection_name=QDRANT_COLLECTION,
-            vectors_config=models.VectorParams(
-                size=EMBEDDING_DIM,
-                distance=models.Distance.COSINE,
-            ),
-        )
-
-    # If collection already has points, assume it is initialized
-    stats = client.get_collection(QDRANT_COLLECTION)
-    if getattr(stats, "points_count", 0) and stats.points_count > 0:
-        return client
 
     docs = [
         (
@@ -255,17 +234,14 @@ def search_knowledge(query: str, k: int = RAG_TOP_K) -> List[str]:
 
     try:
         client = load_vectorstore()
-        #print(f"DEBUG: client type: {type(client)}")
-        #print(f"DEBUG: client attributes: {[a for a in dir(client) if not a.startswith('_')]}")
         query_vector = _embed_texts([query])[0]
-        res = client.query_points(
+        res = client.search(
             collection_name=QDRANT_COLLECTION,
-            query=query_vector,
+            query_vector=query_vector,
             limit=k,
-        ).points
-    except Exception as e:
-        print("RAG error:", repr(e))
-        raise
+        )
+    except Exception:
+        return []
 
     results: List[str] = []
     for point in res:

@@ -9,6 +9,7 @@ __pycache__/
 
 # Environment / secrets
 .env
+.env.*
 
 # Local data / vector store artifacts
 data/*.db

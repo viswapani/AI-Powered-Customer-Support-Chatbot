@@ -5,9 +5,21 @@ import os
 from flask import Flask, request, render_template_string, redirect, url_for, session
 
 from chatbot import MedEquipChatbot
+from rag_pipeline import create_knowledge_base
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key")
+
+# Optionally initialize the base Qdrant knowledge base on startup.
+# This is controlled via the INIT_QDRANT_KB environment variable so
+# deployments can choose whether to run this (e.g., in Docker).
+if os.environ.get("INIT_QDRANT_KB", "false").lower() == "true":
+    try:
+        create_knowledge_base()
+    except Exception as e:
+        # Fail fast in debug, but avoid crashing production by default.
+        # You can tighten this behavior as needed.
+        print(f"Warning: failed to initialize Qdrant KB on startup: {e!r}")
 
 # Single chatbot instance for this process
 bot = MedEquipChatbot()

@@ -1,0 +1,102 @@
+Summary: “SQL-powered” question templates
+
+Here’s a compact list you can use as a checklist:
+
+1. Order delivery
+◦  When will my order ORD-2024-0001 arrive?
+◦  What is the delivery status of order ORD-2024-0001?
+2. Warranty
+◦  What is the warranty status for serial US-2022-1234?
+◦  Is my device US-2022-1234 still under warranty?
+3. Ticket / issue
+◦  What is the status of ticket TKT-2024-0001?
+◦  Give me an update on ticket TKT-2024-0001.
+4. Invoice / billing
+◦  What is the status of invoice INV-2024-3456?
+◦  Has invoice INV-2024-3456 been paid?
+5. Spare parts
+◦  Do you have ECG electrodes in stock?
+◦  What spare parts are available for ventilators?
+
+•  One general support:  
+  What are your support hours?
+•  One policy question:  
+  What is your return policy?
+•  One compliance question:  
+  Does the DL-4000 have FDA 510(k) clearance?
+•  One product spec:  
+  What are the specifications of the CT-4000 scanner?
+•  One AMC/warranty policy:  
+  What AMC tiers do you offer and how do they differ?
+  
+  
+  Here’s a short, ordered script you can run (CLI or web UI) to verify everything.
+
+Step 0 – Pre-conditions
+
+•  DB initialized (once): python verify_db.py
+•  Qdrant KB initialized (once or via startup): python rag_pipeline.py
+•  ENABLE_RAG = True in config.py
+
+
+
+Part A – RAG side (no auth required)
+
+1. Support hours (RAG, GENERAL_SUPPORT)  
+   What are your support hours?  
+   Expect: Text mentioning 24/7 support and phone numbers.
+
+2. Returns policy (RAG)  
+   What is your return policy?  
+   Expect: 30-day return window, RMA requirement, original packaging.
+
+3. Compliance (RAG)  
+   Does the DiagnosticLab DL-4000 have FDA 510(k) clearance?  
+   Expect: Answer confirming FDA 510(k) and that it’s for diagnostic imaging.
+
+4. Product specs (RAG)  
+   What are the specifications of the CT-4000 scanner?  
+   Expect: 128-slice detector, 0.35s rotation, 78cm gantry aperture.
+
+If these give rich, policy/spec-style answers, RAG + Qdrant + OpenAI embeddings are working.
+
+
+
+Part B – SQL side (requires auth, uses seeded demo data)
+
+Use exactly these IDs:  
+•  Client: contact@cityhospital.com / ME-10001  
+•  Order: ORD-2024-0001  
+•  Ticket: TKT-2024-0001  
+•  Invoice: INV-2024-3456  
+•  Serial: US-2022-1234
+5. Authenticate (required for all SQL flows)  
+◦  In CLI:  
+▪  auth  
+▪  Email: contact@cityhospital.com  
+▪  Client ID: ME-10001  
+◦  In web UI: fill in the same and click “Set Authentication”.  
+   Expect: message indicating you’re authenticated as City General Hospital / ME-10001.
+
+6. Order delivery (SQL, ORDER_DELIVERY)  
+   When will my order ORD-2024-0001 arrive?  
+   Expect: Status (e.g., “In Transit”) and expected delivery date.
+
+7. Warranty status (SQL, WARRANTY_AMC)  
+   What is the warranty status for serial US-2022-1234?  
+   Expect: Warranty ID, start/end dates, coverage level.
+
+8. Ticket status (SQL, ISSUE_RESOLUTION)  
+   What is the status of ticket TKT-2024-0001?  
+   Expect: Current ticket status and latest history note with timestamp.
+
+9. Invoice status (SQL, FINANCIAL)  
+   Has invoice INV-2024-3456 been paid?  
+   Expect: Status “Paid” and amount/due date.
+
+10. Spare parts (SQL, SPARE_PARTS)  
+    Do you have ECG electrodes in stock?  
+    Expect: A line from parts_catalog with stock quantity and unit price.
+
+If A works but B fails → likely DB / auth / MySQL issues.  
+If B works but A fails → likely Qdrant / RAG / OpenAI setup.

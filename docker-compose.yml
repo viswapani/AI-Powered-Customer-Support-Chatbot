@@ -1,0 +1,38 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - "6333:6333"          # expose Qdrant HTTP API on localhost:6333
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
+  chatbot:
+    build: .                 # uses your existing Dockerfile
+    container_name: medequip-chatbot
+    depends_on:
+      - qdrant
+    environment:
+      # Qdrant connection from inside the container
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+
+      # MySQL connection to local host MySQL from inside the container
+      MEDEQUIP_DB_HOST: host.docker.internal
+      MEDEQUIP_DB_PORT: 3306
+      MEDEQUIP_DB_USER: medequip_user       # change if your local user is different
+      MEDEQUIP_DB_PASSWORD: medequip123     # change if your local password is different
+      MEDEQUIP_DB_NAME: medequip            # change if your local DB name is different
+
+      # OpenAI API key (must be set in your host env or .env file)
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+
+      # Auto-initialize the base Qdrant knowledge base on Flask startup.
+      # Safe to run on every start because create_knowledge_base() is non-destructive.
+      INIT_QDRANT_KB: "true"
+
+    ports:
+      - "8000:8000"          # host:container, matches FLASK_RUN_PORT=8000
+
+volumes:
+  qdrant_storage:
